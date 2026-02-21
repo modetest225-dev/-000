@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Icy Tower - محمد حمدي</title>
+    <style>
+        body { margin: 0; background: #222; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: Arial, sans-serif; overflow: hidden; }
+        canvas { background: #87CEEB; border: 5px solid #fff; box-shadow: 0 0 20px rgba(0,0,0,0.5); display: block; }
+        .credits { margin-top: 15px; font-size: 20px; font-weight: bold; }
+        .credits a { color: #00d2ff; text-decoration: none; border-bottom: 2px solid transparent; transition: 0.3s; }
+        .credits a:hover { color: #ff4757; border-bottom: 2px solid #ff4757; }
+        .info { font-size: 14px; margin-bottom: 10px; color: #ccc; }
+    </style>
+</head>
+<body>
+
+    <div class="info">استخدم الأسهم للحركة والمسافة (Space) للقفز</div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+    <!-- حقوق الملكية -->
+    <div class="credits">
+        صُنعت بواسطة <a href="https://www.facebook.com" target="_blank">محمد حمدي</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let player = { x: 200, y: 550, width: 30, height: 30, dy: 0, dx: 0, jumpPower: -12, grounded: false };
+        let gravity = 0.5;
+        let platforms = [];
+        let cameraY = 0;
+        let score = 0;
+
+        // توليد المنصات البدائية
+        for (let i = 0; i < 10; i++) {
+            platforms.push({ x: Math.random() * 300, y: 600 - i * 100, width: 100, height: 15 });
+        }
+
+        const keys = {};
+        window.addEventListener('keydown', (e) => keys[e.code] = true);
+        window.addEventListener('keyup', (e) => keys[e.code] = false);
+
+        function update() {
+            // حركة اللاعب
+            if (keys['ArrowLeft']) player.dx = -5;
+            else if (keys['ArrowRight']) player.dx = 5;
+            else player.dx = 0;
+
+            if (keys['Space'] && player.grounded) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+            }
+
+            player.dy += gravity;
+            player.x += player.dx;
+            player.y += player.dy;
+
+            // حدود الشاشة
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // تصادم المنصات
+            player.grounded = false;
+            platforms.forEach(p => {
+                if (player.dy > 0 && 
+                    player.x < p.x + p.width && player.x + player.width > p.x &&
+                    player.y + player.height > p.y && player.y + player.height < p.y + p.height + player.dy) {
+                    player.y = p.y - player.height;
+                    player.dy = 0;
+                    player.grounded = true;
+                }
+            });
+
+            // تحريك الكاميرا للأعلى
+            if (player.y < canvas.height / 2) {
+                let diff = canvas.height / 2 - player.y;
+                player.y += diff;
+                platforms.forEach(p => {
+                    p.y += diff;
+                    if (p.y > canvas.height) {
+                        p.y = 0;
+                        p.x = Math.random() * 300;
+                        score++;
+                    }
+                });
+            }
+
+            // الموت (السقوط)
+            if (player.y > canvas.height) {
+                alert("انتهت اللعبة! سكورك: " + score);
+                location.reload();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم المنصات
+            ctx.fillStyle = '#2ed573';
+            platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
+
+            // رسم اللاعب
+            ctx.fillStyle = '#ff4757';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // رسم السكور
+            ctx.fillStyle = "black";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+
+            requestAnimationFrame(() => {
+                update();
+                draw();
+            });
+        }
+
+        draw();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Icy Tower - محمد حمدي</title>
+    <style>
+        body { margin: 0; background: #222; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: Arial, sans-serif; overflow: hidden; }
+        canvas { background: #87CEEB; border: 5px solid #fff; box-shadow: 0 0 20px rgba(0,0,0,0.5); display: block; }
+        .credits { margin-top: 15px; font-size: 20px; font-weight: bold; }
+        .credits a { color: #00d2ff; text-decoration: none; border-bottom: 2px solid transparent; transition: 0.3s; }
+        .credits a:hover { color: #ff4757; border-bottom: 2px solid #ff4757; }
+        .info { font-size: 14px; margin-bottom: 10px; color: #ccc; }
+    </style>
+</head>
+<body>
+
+    <div class="info">استخدم الأسهم للحركة والمسافة (Space) للقفز</div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+    <!-- حقوق الملكية -->
+    <div class="credits">
+        صُنعت بواسطة <a href="https://www.facebook.com" target="_blank">محمد حمدي</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let player = { x: 200, y: 550, width: 30, height: 30, dy: 0, dx: 0, jumpPower: -12, grounded: false };
+        let gravity = 0.5;
+        let platforms = [];
+        let cameraY = 0;
+        let score = 0;
+
+        // توليد المنصات البدائية
+        for (let i = 0; i < 10; i++) {
+            platforms.push({ x: Math.random() * 300, y: 600 - i * 100, width: 100, height: 15 });
+        }
+
+        const keys = {};
+        window.addEventListener('keydown', (e) => keys[e.code] = true);
+        window.addEventListener('keyup', (e) => keys[e.code] = false);
+
+        function update() {
+            // حركة اللاعب
+            if (keys['ArrowLeft']) player.dx = -5;
+            else if (keys['ArrowRight']) player.dx = 5;
+            else player.dx = 0;
+
+            if (keys['Space'] && player.grounded) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+            }
+
+            player.dy += gravity;
+            player.x += player.dx;
+            player.y += player.dy;
+
+            // حدود الشاشة
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // تصادم المنصات
+            player.grounded = false;
+            platforms.forEach(p => {
+                if (player.dy > 0 && 
+                    player.x < p.x + p.width && player.x + player.width > p.x &&
+                    player.y + player.height > p.y && player.y + player.height < p.y + p.height + player.dy) {
+                    player.y = p.y - player.height;
+                    player.dy = 0;
+                    player.grounded = true;
+                }
+            });
+
+            // تحريك الكاميرا للأعلى
+            if (player.y < canvas.height / 2) {
+                let diff = canvas.height / 2 - player.y;
+                player.y += diff;
+                platforms.forEach(p => {
+                    p.y += diff;
+                    if (p.y > canvas.height) {
+                        p.y = 0;
+                        p.x = Math.random() * 300;
+                        score++;
+                    }
+                });
+            }
+
+            // الموت (السقوط)
+            if (player.y > canvas.height) {
+                alert("انتهت اللعبة! سكورك: " + score);
+                location.reload();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم المنصات
+            ctx.fillStyle = '#2ed573';
+            platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
+
+            // رسم اللاعب
+            ctx.fillStyle = '#ff4757';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // رسم السكور
+            ctx.fillStyle = "black";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score: " + score, 10, 30);
+
+            requestAnimationFrame(() => {
+                update();
+                draw();
+            });
+        }
+
+        draw();
+    </script>
+</body>
+</html>
